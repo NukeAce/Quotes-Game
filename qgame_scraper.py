@@ -39,28 +39,28 @@ def quote_writer(quotes_array, writer):
         print(author)
 
 
-# First we scrape the quotes from this website using BS4 and store them in a csv file
-URL = "http://quotes.toscrape.com"
-response = requests.get(URL)
-soup = BeautifulSoup(response.text, "html.parser")
-next_button = soup.find("li", attrs="next")
-quotes = soup.select(".quote")
+def quotes_scraper():
+    # First we scrape the quotes from this website using BS4 and store them in a csv file
+    URL = "http://quotes.toscrape.com"
+    response = requests.get(URL)
+    soup = BeautifulSoup(response.text, "html.parser")
+    next_button = soup.find("li", attrs="next")
+    quotes = soup.select(".quote")
 
-
-# We create a csv file to store the data
-with open("quote_db.csv", "w", encoding="utf-8") as file:
-    headers = ["Author", "Quote", "Bio"]
-    csv_writer = csv.DictWriter(file, fieldnames=headers)
-    csv_writer.writeheader()
-    # Then we save the homepage data into csv
-    quote_writer(quotes, csv_writer)
-    # Then we access each quote to extract the quote author and bio to make the game.
-    while next_button is not None:
-        next_page = next_button.findChild()["href"]
-        URL = f"http://quotes.toscrape.com{next_page}"
-        sleep(1)
-        response = requests.get(URL)
-        soup = BeautifulSoup(response.text, "html.parser")
-        quotes = soup.select(".quote")
+    # We create a csv file to store the data
+    with open("quote_db.csv", "w", encoding="utf-8") as file:
+        headers = ["Author", "Quote", "Bio"]
+        csv_writer = csv.DictWriter(file, fieldnames=headers)
+        csv_writer.writeheader()
+        # Then we save the homepage data into csv
         quote_writer(quotes, csv_writer)
-        next_button = soup.find("li", attrs="next")
+        # Then we access each quote to extract the quote author and bio to make the game.
+        while next_button is not None:
+            next_page = next_button.findChild()["href"]
+            URL = f"http://quotes.toscrape.com{next_page}"
+            sleep(1)
+            response = requests.get(URL)
+            soup = BeautifulSoup(response.text, "html.parser")
+            quotes = soup.select(".quote")
+            quote_writer(quotes, csv_writer)
+            next_button = soup.find("li", attrs="next")
